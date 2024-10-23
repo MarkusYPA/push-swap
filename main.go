@@ -130,9 +130,10 @@ func revRotate(s []int) []int {
 
 func cleanInsts(ins []string) []string {
 	found := true
+
+	// remove all pairs of pb-pa
 	for found {
 		found = false
-		// remove all pairs of pb-pa
 		for i := 0; i < len(ins)-1; i++ {
 			if ins[i] == "pb" && ins[i+1] == "pa" {
 				if i == len(ins)-2 {
@@ -143,8 +144,59 @@ func cleanInsts(ins []string) []string {
 				found = true
 			}
 		}
-
 	}
+
+	// turn pairs of rra-rrb or rrb-rra to rrr
+	found = true
+	for found {
+		found = false
+		for i := 0; i < len(ins)-1; i++ {
+			if (ins[i] == "rra" && ins[i+1] == "rrb") || (ins[i] == "rrb" && ins[i+1] == "rra") {
+				ins[i] = "rrr"
+				if i == len(ins)-2 {
+					ins = ins[:i+1]
+				} else {
+					ins = append(ins[:i+1], ins[i+2:]...)
+				}
+				found = true
+			}
+		}
+	}
+
+	// turn pairs of ra-rb or rb-ra to rr
+	found = true
+	for found {
+		found = false
+		for i := 0; i < len(ins)-1; i++ {
+			if (ins[i] == "ra" && ins[i+1] == "rb") || (ins[i] == "rb" && ins[i+1] == "ra") {
+				ins[i] = "rr"
+				if i == len(ins)-2 {
+					ins = ins[:i+1]
+				} else {
+					ins = append(ins[:i+1], ins[i+2:]...)
+				}
+				found = true
+			}
+		}
+	}
+
+	// turn pairs of sa-sb or sb-sa to ss
+	found = true
+	for found {
+		found = false
+		for i := 0; i < len(ins)-1; i++ {
+			if (ins[i] == "sa" && ins[i+1] == "sb") || (ins[i] == "sb" && ins[i+1] == "sa") {
+				ins[i] = "ss"
+				if i == len(ins)-2 {
+					ins = ins[:i+1]
+				} else {
+					ins = append(ins[:i+1], ins[i+2:]...)
+				}
+				found = true
+			}
+		}
+	}
+
 	return ins
 }
 
@@ -185,6 +237,10 @@ func isOnList(n int, l []int) bool {
 	return false
 }
 
+func last(s []int) int {
+	return s[len(s)-1]
+}
+
 func main() {
 	args := os.Args[1:]
 
@@ -196,18 +252,27 @@ func main() {
 	aSorted = bubSort(stackA, isGreater)
 	instructions := []string{}
 
-	if len(stackA) < 35 {
-		// Method where the elements (-2 smallest) are first transferred
-		// to stackB to reverse order
-		instructions = sortToBMethod(instructions)
-	} else {
-		// Method where each next element (and any incidental bigger-half element)
-		// is first moved to B then back to A at the correct position
-		instructions = sortAtAMethod(instructions)
-	}
+	/* 	if len(stackA) < 35 {
+	   		// Method where the elements (-2 smallest) are first transferred
+	   		// to stackB to reverse order
+	   		instructions = sortToBMethod(instructions)
+	   	} else {
+	   		// Method where each next element (and any incidental bigger-half element)
+	   		// is first moved to B then back to A at the correct position
+	   		instructions = sortAtAMethod(instructions)
+
+	   		// Method where the biggre half is moved to B at the beginning
+	   		//instructions = bigsToB(instructions)
+	   	} */
+
+	//instructions = sortToBMethod(instructions)
+	//instructions = bigsToB(instructions)
+	//instructions = sortAtAMethod(instructions)
+	instructions = twoStacksMethod(instructions)
+
 	instructions = cleanInsts(instructions)
 
-	fmt.Println(instructions)
+	//fmt.Println(instructions)
 	fmt.Println("A:", stackA)
 	fmt.Println(len(instructions), "instructions")
 

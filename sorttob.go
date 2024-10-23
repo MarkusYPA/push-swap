@@ -143,7 +143,6 @@ func shortestToBLast(a, bs []int) []string {
 	}
 
 	runComms(comms)
-	//fmt.Println(comms, stackB)
 	return comms
 }
 
@@ -155,20 +154,14 @@ func sortToBMethod(ins []string) []string {
 		bSorted = bSorted[2:]
 	}
 
-	//fmt.Println("A sorted:", aSorted)
-
 	for len(stackA) > 2 {
 		ins = append(ins, shortestToBLast(stackA, bSorted)...)
 	}
-
-	//fmt.Println("stackA:", stackA)
 
 	if len(stackA) == 2 && stackA[0] > stackA[1] {
 		runComms([]string{"sa"})
 		ins = append(ins, "sa")
 	}
-
-	//fmt.Println("B before returns:", stackB)
 
 	for len(stackB) > 0 {
 		runComms([]string{"pa"})
