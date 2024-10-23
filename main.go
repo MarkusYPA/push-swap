@@ -268,7 +268,8 @@ func main() {
 	//instructions = sortToBMethod(instructions)
 	//instructions = bigsToB(instructions)
 	//instructions = sortAtAMethod(instructions)
-	instructions = twoStacksMethod(instructions)
+	//instructions = twoStacksMethod(instructions)
+	instructions = secretOrder(instructions)
 
 	instructions = cleanInsts(instructions)
 
