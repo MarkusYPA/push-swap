@@ -46,17 +46,9 @@ func toTop(n int, s []int, l string) []string {
 	}
 
 	if float64(posD) <= float64(negD) {
-		for i := 0; i < posD; i++ {
-			comms = append(comms, calls[0])
-			runComm(calls[0])
-			//comms = append(comms, doSwap()...)
-		}
+		comms = append(comms, rotStack(posD, calls[0])...)
 	} else {
-		for i := 0; i < negD; i++ {
-			comms = append(comms, calls[1])
-			runComm(calls[1])
-			//comms = append(comms, doSwap()...)
-		}
+		comms = append(comms, rotStack(negD, calls[1])...)
 	}
 	return comms
 }

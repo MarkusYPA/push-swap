@@ -252,6 +252,8 @@ func main() {
 	aSorted = bubSort(stackA, isGreater)
 	instructions := []string{}
 
+	//instructions = bigsToB(instructions)
+
 	/* 	if len(stackA) < 35 {
 	   		// Method where the elements (-2 smallest) are first transferred
 	   		// to stackB to reverse order
@@ -265,10 +267,6 @@ func main() {
 	   		//instructions = bigsToB(instructions)
 	   	} */
 
-	//instructions = sortToBMethod(instructions)
-	//instructions = bigsToB(instructions)
-	//instructions = sortAtAMethod(instructions)
-	//instructions = twoStacksMethod(instructions)
 	instructions = secretOrder(instructions)
 
 	instructions = cleanInsts(instructions)
