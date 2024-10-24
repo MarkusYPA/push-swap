@@ -273,6 +273,7 @@ func main() {
 
 	//fmt.Println(instructions)
 	fmt.Println("A:", stackA)
+	fmt.Println("B:", stackB)
 	fmt.Println(len(instructions), "instructions")
 
 	if reflect.DeepEqual(stackA, aSorted) {
