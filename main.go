@@ -267,8 +267,9 @@ func main() {
 	   		//instructions = bigsToB(instructions)
 	   	} */
 
+	fmt.Println()
 	instructions = secretOrder(instructions)
-
+	fmt.Println(len(instructions), "instructions")
 	instructions = cleanInsts(instructions)
 
 	//fmt.Println(instructions)

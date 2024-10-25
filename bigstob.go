@@ -35,24 +35,6 @@ func bigsToB(ins []string) []string {
 	return ins
 }
 
-func toTop(n int, s []int, l string) []string {
-	comms := []string{}
-	posD, negD := distances(s, n)
-	calls := []string{"", ""}
-	if l == "A" {
-		calls[0], calls[1] = "ra", "rra"
-	} else {
-		calls[0], calls[1] = "rb", "rrb"
-	}
-
-	if float64(posD) <= float64(negD) {
-		comms = append(comms, rotStack(posD, calls[0])...)
-	} else {
-		comms = append(comms, rotStack(negD, calls[1])...)
-	}
-	return comms
-}
-
 func moveToB(bigs []int) []string {
 	comms := []string{}
 	for _, n := range stackA {

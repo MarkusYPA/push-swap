@@ -1,13 +1,13 @@
 
 
-		stB simple	sort to B	sort at A	bigs to B
-7 numbers			15		19		19
-10 numbers			25		34		39
-15 numbers			61		78		60
-30 numbers			183		184		150
-100 numbers	1443		1252		1070		957
-Audit 1				8		14		19
-Audit 2 			0		6		6
+		         stBsimple	sortToB	  sortAtA	  bigsToB   secret  
+7 numbers			15		     19		     19                  13
+10 numbers			         25		     34		     39        30
+15 numbers			         61		     78		     60        45
+30 numbers			         183		   184		   150       125
+100 numbers	  1443		   1252		   1070		   957       804
+Audit 1				           8		     14		     19
+Audit 2 		             0		     6		     6
 Audit 3				err		err		err
 Audit 4				0		8		4
 5 numbers -7			10		13		14

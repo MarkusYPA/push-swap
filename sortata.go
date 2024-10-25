@@ -60,16 +60,6 @@ func sortAtAMethod(ins []string) []string {
 	return ins
 }
 
-// rotStack runs a command cmd a given number d of times and returns the commands
-func rotStack(d int, cmd string) []string {
-	comms := []string{}
-	for i := 0; i < d; i++ {
-		comms = append(comms, cmd)
-	}
-	runComms(comms)
-	return comms
-}
-
 // toBPos pushes element at index ind to stack B, as well as any other encountered element on the bigger half while reversing
 func toBPos(ind int) []string {
 	comms := []string{}
