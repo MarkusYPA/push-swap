@@ -4,74 +4,71 @@ import (
 	"fmt"
 )
 
+// secretOrder leaves the longest already sorted sequence of numbers on stackA, moves the rest to
+// stackB and then moves them back one-by-one into suitable gaps
 func secretOrder(ins []string) []string {
 
 	allOrders := [][]int{}
 	for i := range stackA {
 		getAllOrders(i, i, []int{}, &allOrders)
 	}
+	bestOs := bestOrders(&allOrders)
+	fmt.Println("Length of all orders:", len(allOrders), "Bests found:", len(bestOs), "Length of Best:", len(bestOs[0]))
 
-	fmt.Println("Length of all orders:", len(allOrders))
-	bestO := bestOrder(&allOrders)
-	/* 	fmt.Print("The best one is ", len(bestO), " long: ")
-	   	for _, ind := range bestO {
-	   		fmt.Printf("%v ", stackA[ind])
-	   	}
-	   	fmt.Println(bestO)
-	   	fmt.Println() */
+	origStackA := make([]int, len(stackA))
+	copy(origStackA, stackA)
+	origStackB := make([]int, len(stackB))
+	copy(origStackB, stackB)
 
-	bestValues := []int{}
-	for _, ind := range bestO {
-		bestValues = append(bestValues, stackA[ind])
-	}
-	ins = append(ins, pushToB(bestValues)...)
+	bestNewInsts := []string{}
+	for i, best := range bestOs {
 
-	for len(stackB) > 0 {
+		stackA = make([]int, len(origStackA))
+		stackB = make([]int, len(origStackB))
+		copy(stackA, origStackA)
+		copy(stackB, origStackB)
 
-		// Put elements from stackB into suitable gaps on stackA
-		for {
-			// Find nearest gap
-			p1, p2, err := nearestGap()
-			if err != nil {
-				fmt.Println("stacks when no more gaps:", stackA, stackB)
-				break
+		bestValues := []int{}
+		for _, ind := range best {
+			bestValues = append(bestValues, stackA[ind])
+		}
+		newInsts := pushToB(bestValues)
+
+		for len(stackB) > 0 {
+
+			// Put elements from stackB into suitable gaps on stackA
+			for {
+				// Find nearest gap
+				p1, p2, err := nearestGap()
+				if err != nil {
+					break
+				}
+
+				// Move p1 to the top of A, p2 to the top of B and push from B to A
+				newInsts = append(newInsts, toTop(p1, stackA, "A")...)
+				runComms(toTop(p1, stackA, "A"))
+				newInsts = append(newInsts, toTop(p2, stackB, "B")...)
+				runComms(toTop(p2, stackB, "B"))
+				newInsts = append(newInsts, "pa")
+				runComm("pa")
 			}
-
-			// Move p1 to the top of A, p2 to the top of B and push from B to A
-			runComms(toTop(p1, stackA, "A"))
-			ins = append(ins, toTop(p1, stackA, "A")...)
-			runComms(toTop(p2, stackB, "B"))
-			ins = append(ins, toTop(p2, stackB, "B")...)
-			runComm("pa")
-			ins = append(ins, "pa")
 		}
 
-		// Put small or big elements still on stackB to the gap between the biggest and smallest element on stackA
-		for {
-			// Find nearest end
-			p1, p2, err := nearestEndGap()
-			if err != nil {
-				break
-			}
+		newInsts = append(newInsts, toTop(smallestOnList(stackA), stackA, "A")...)
+		runComms(toTop(smallestOnList(stackA), stackA, "A"))
 
-			if p2 == 967 {
-				fmt.Println("967 at end seek")
-			}
-
-			// Move p1 to the top of A, p2 to the top of B and push from B to A
-			runComms(toTop(p1, stackA, "A"))
-			ins = append(ins, toTop(p1, stackA, "A")...)
-			runComms(toTop(p2, stackB, "B"))
-			ins = append(ins, toTop(p2, stackB, "B")...)
-			runComm("pa")
-			ins = append(ins, "pa")
+		if i == 0 || len(newInsts) < len(bestNewInsts) {
+			bestNewInsts = newInsts
 		}
-		fmt.Println("A:", stackA, "B:", stackB)
 	}
-	fmt.Println("D")
 
-	runComms(toTop(smallestOnList(stackA), stackA, "A"))
-	ins = append(ins, toTop(smallestOnList(stackA), stackA, "A")...)
+	stackA = make([]int, len(origStackA))
+	stackB = make([]int, len(origStackB))
+	copy(stackA, origStackA)
+	copy(stackB, origStackB)
+
+	runComms(bestNewInsts)
+	ins = append(ins, bestNewInsts...)
 
 	return ins
 }
@@ -182,7 +179,7 @@ func nearestGap() (int, int, error) {
 
 	for i := 0; i < len(stackA); i++ {
 		for j := 0; j < len(stackB); j++ {
-			if midGapOnA(i, stackB[j]) {
+			if midGapOnA(i, stackB[j]) || endGapOnA(i, stackB[j]) {
 				if !foundOne {
 					p1, p2 = stackA[i], stackB[j]
 					distOld = min(distances(stackA, p1)) + min(distances(stackB, p2))
@@ -205,6 +202,7 @@ func nearestGap() (int, int, error) {
 	}
 }
 
+// pushToB moves values NOT on slice nums to stackB
 func pushToB(nums []int) []string {
 	ins := []string{}
 	for _, n := range stackA {
@@ -220,22 +218,24 @@ func pushToB(nums []int) []string {
 }
 
 // bestOrder finds the longest sequence of ordered numbers with the lowest starting index
-func bestOrder(allOrders *[][]int) []int {
-	best := (*allOrders)[0]
+func bestOrders(allOrders *[][]int) [][]int {
+	longest := len((*allOrders)[0])
 	for _, o := range *allOrders {
-		if len(o) > len(best) {
-			best = o
-		}
-		if len(o) == len(best) && o[0] < best[0] {
-			best = o
+		if len(o) > longest {
+			longest = len(o)
 		}
 	}
-	return best
+	bests := [][]int{}
+	for _, o := range *allOrders {
+		if len(o) == longest {
+			bests = append(bests, o)
+		}
+	}
+	return bests
 }
 
 // getAllOrders finds all sequences on increasing numbers through stackA starting from the element at index start
 func getAllOrders(start int, index int, curSolution []int, orders *[][]int) {
-
 	curSolution = append(curSolution, index)
 
 	// Find the indices of all remaining values bigger than this
