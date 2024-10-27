@@ -4,20 +4,20 @@ import (
 	"fmt"
 )
 
-// secretOrder leaves the longest already sorted sequence of numbers on stackA, moves the rest to
+// hiddenOrder leaves the longest already sorted sequence of numbers on stackA, moves the rest to
 // stackB and then moves them back one-by-one into suitable gaps
-func secretOrder(ins []string) []string {
+func hiddenOrder(ins []string) []string {
 
 	allOrders := [][]int{}
 	for i := range stackA {
 		getAllOrders(i, i, []int{}, &allOrders)
 	}
 	bestOs := bestOrders(&allOrders)
-	fmt.Println("Length of all orders:", len(allOrders), "Bests found:", len(bestOs), "Length of Best:", len(bestOs[0]))
+	//fmt.Println("Length of all orders:", len(allOrders), "Bests found:", len(bestOs), "Length of Best:", len(bestOs[0]))
 
 	origStackA := make([]int, len(stackA))
-	copy(origStackA, stackA)
 	origStackB := make([]int, len(stackB))
+	copy(origStackA, stackA)
 	copy(origStackB, stackB)
 
 	bestNewInsts := []string{}
@@ -276,7 +276,7 @@ func getAllOrders(start int, index int, curSolution []int, orders *[][]int) {
 		return
 	}
 
-	//search all hidden orders for all the bigger numbers
+	//get all hidden orders for all the bigger numbers
 	for _, n := range biggers {
 		getAllOrders(start, n, curSolution, orders)
 	}
