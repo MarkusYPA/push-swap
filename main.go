@@ -199,8 +199,8 @@ func cleanInsts(ins []string) []string {
 	return ins
 }
 
-// distances returns how many instructions are needed to rotate stackA in
-// the positive and the negative directions so that num is on top
+// distances returns how many instructions are needed to rotate a stack a in
+// the positive and the negative directions so that element num is on top
 func distances(a []int, num int) (int, int) {
 
 	// measure positive distance to num
@@ -237,10 +237,7 @@ func isOnList(n int, l []int) bool {
 	return false
 }
 
-func last(s []int) int {
-	return s[len(s)-1]
-}
-
+// validate returns false upon finding a duplicate on a slice of ints
 func validate(stack []int) bool {
 	for i := 0; i < len(stack)-1; i++ {
 		for j := i + 1; j < len(stack); j++ {
@@ -250,6 +247,56 @@ func validate(stack []int) bool {
 		}
 	}
 	return true
+}
+
+// produceInstructions reads the input, runs two different sorting algorithms on it to get
+// two separate sets of instructions as slices and chooses the shorter slice for output
+func produceInstructions(argument string) ([]string, error) {
+	var err error
+	stackA, err = toNums(argument)
+	if err != nil {
+		return nil, fmt.Errorf("Error")
+	}
+	if !validate(stackA) {
+		return nil, fmt.Errorf("Error")
+	}
+	aSorted = bubSort(stackA, isGreater)
+
+	// save the stacks for the other algorithm
+	origStackA := make([]int, len(stackA))
+	origStackB := make([]int, len(stackB))
+	copy(origStackA, stackA)
+	copy(origStackB, stackB)
+
+	instructions1 := []string{}
+	instructions1 = sortToBMethod(instructions1)
+	instructions1 = cleanInsts(instructions1)
+
+	// restore the original stacks
+	stackA = make([]int, len(origStackA))
+	stackB = make([]int, len(origStackB))
+	copy(stackA, origStackA)
+	copy(stackB, origStackB)
+
+	instructions2 := []string{}
+	instructions2 = hiddenOrder(instructions2)
+	instructions2 = cleanInsts(instructions2)
+
+	// choose the shorter instructions
+	var instructions []string
+	if len(instructions1) < len(instructions2) {
+		instructions = instructions1
+	} else {
+		instructions = instructions2
+	}
+
+	/* 	stackA = make([]int, len(origStackA)) // restore stacks and run commands for testing inside this program
+	   	stackB = make([]int, len(origStackB))
+	   	copy(stackA, origStackA)
+	   	copy(stackB, origStackB)
+	   	runComms(instructions) */
+
+	return instructions, nil
 }
 
 func main() {
@@ -262,75 +309,22 @@ func main() {
 		log.Fatalln("Use with one argument, e.g.: ./push-swap \"7 12 0 31 3\" ")
 	}
 
-	var err error
-	stackA, err = toNums(args[0])
+	instructions, err := produceInstructions(args[0])
 	if err != nil {
-		fmt.Println("Error")
+		fmt.Println(err.Error())
 		return
 	}
-	if !validate(stackA) {
-		fmt.Println("Error")
-		return
-	}
-	aSorted = bubSort(stackA, isGreater)
-
-	origStackA := make([]int, len(stackA))
-	origStackB := make([]int, len(stackB))
-	copy(origStackA, stackA)
-	copy(origStackB, stackB)
-
-	//instructions = bigsToB(instructions)
-
-	/* 	if len(stackA) < 35 {
-	   		// Method where the elements (-2 smallest) are first transferred
-	   		// to stackB to reverse order
-	   		instructions = sortToBMethod(instructions)
-	   	} else {
-	   		// Method where each next element (and any incidental bigger-half element)
-	   		// is first moved to B then back to A at the correct position
-	   		instructions = sortAtAMethod(instructions)
-
-	   		// Method where the biggre half is moved to B at the beginning
-	   		//instructions = bigsToB(instructions)
-	   	} */
-
-	instructions1 := []string{}
-	instructions1 = sortToBMethod(instructions1)
-	instructions1 = cleanInsts(instructions1)
-
-	stackA = make([]int, len(origStackA))
-	stackB = make([]int, len(origStackB))
-	copy(stackA, origStackA)
-	copy(stackB, origStackB)
-
-	instructions2 := []string{}
-	instructions2 = hiddenOrder(instructions2)
-	instructions2 = cleanInsts(instructions2)
-
-	stackA = make([]int, len(origStackA))
-	stackB = make([]int, len(origStackB))
-	copy(stackA, origStackA)
-	copy(stackB, origStackB)
-
-	var instructions []string
-	if len(instructions1) < len(instructions2) {
-		instructions = instructions1
-	} else {
-		instructions = instructions2
-	}
-
-	runComms(instructions)
 
 	for _, ins := range instructions {
 		fmt.Println(ins)
 	}
 
-	/*
-		 	fmt.Println(len(instructions), "instructions")
-			if reflect.DeepEqual(stackA, aSorted) {
-				fmt.Println("Stack A is sorted")
-			} else {
-				fmt.Println("Stack A is NOT sorted")
-			}
+	/*		// test if the stack got sorted
+			 	fmt.Println(len(instructions), "instructions")
+				if reflect.DeepEqual(stackA, aSorted) {
+					fmt.Println("Stack A is sorted")
+				} else {
+					fmt.Println("Stack A is NOT sorted")
+				}
 	*/
 }

@@ -12,10 +12,3 @@ Audits:
 5 random
 "36 12 33 48 38"
 "25 75 99 46 26"
-
-
-
-
-This is my string  !  Continues
-This is my string  !
-"This is my string" + "!"

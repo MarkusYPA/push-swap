@@ -102,6 +102,17 @@ func toTop(n int, s []int, l string) []string {
 	return comms
 }
 
+// smallestOnList returns the smallest element on a slice of integers
+func smallestOnList(s []int) int {
+	small := s[0]
+	for _, n := range s {
+		if n < small {
+			small = n
+		}
+	}
+	return small
+}
+
 // goodGapOnA checks if the element elemB from stackB fits in the gap between index indA and index indA+1 on stackA
 func midGapOnA(indA, elemB int) bool {
 	for i := 1; i < len(stackA); i++ {

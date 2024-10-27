@@ -62,12 +62,6 @@ func biggestOnList(s []int) int {
 	return big
 }
 
-func smallestOnList(s []int) int {
-	small := s[0]
-	for _, n := range s {
-		if n < small {
-			small = n
-		}
-	}
-	return small
+func last(s []int) int {
+	return s[len(s)-1]
 }

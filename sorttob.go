@@ -1,12 +1,13 @@
 package main
 
+// shortestToBLast finds the shortest way to place the largest value from stackA to stackB and does it
 func shortestToBLast(a, bs []int) []string {
 	nextToB := len(bs) - 1 - len(stackB)
 	Bnxt0 := bs[nextToB] // Next element to push to stackB
 
 	var Bnxt1 int
 	var isB1 bool
-	if nextToB > 0 { // Also get the next in line if not already at last
+	if nextToB > 0 { // Get the next in line if there is one
 		isB1 = true
 		Bnxt1 = bs[nextToB-1]
 	}
