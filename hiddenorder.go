@@ -171,7 +171,8 @@ func nearestEndGap() (int, int, error) {
 	}
 }
 
-// nearestPair finds the gap on stackA that fits an element from stackB that can be filled with the fewest moves
+// nearestPair finds the gap on stackA that fits an element from stackB that can be filled with
+// the fewest moves
 func nearestGap() (int, int, error) {
 	p1, p2 := 0, 0
 	foundOne := false
@@ -231,10 +232,32 @@ func bestOrders(allOrders *[][]int) [][]int {
 			bests = append(bests, o)
 		}
 	}
+	for _, o := range *allOrders {
+		if len(o) > 1 && len(o) == longest-1 && len(bests) <= 5000 {
+			bests = append(bests, o)
+		}
+		/* if len(bests) == 5000 {
+			fmt.Println("at -1")
+			break
+		} */
+	}
+	for _, o := range *allOrders {
+		if len(o) > 1 && len(o) == longest-2 && len(bests) <= 5000 {
+			bests = append(bests, o)
+		}
+		/* if len(bests) == 5000 {
+			fmt.Println("at -2")
+			break
+		} */
+	}
 	return bests
 }
 
-// getAllOrders finds all sequences on increasing numbers through stackA starting from the element at index start
+// Store examined values on a map with their indices at that solution (later is better)
+//var founds map[int]int = map[int]int{}
+
+// getAllOrders finds all sequences of increasing numbers through stackA starting from
+// the element at index start
 func getAllOrders(start int, index int, curSolution []int, orders *[][]int) {
 	curSolution = append(curSolution, index)
 
@@ -273,11 +296,23 @@ func getAllOrders(start int, index int, curSolution []int, orders *[][]int) {
 		toSave := make([]int, len(curSolution))
 		copy(toSave, curSolution)
 		*orders = append(*orders, toSave)
+
+		/* 		for i, n := range toSave {
+			if _, ok := founds[n]; !ok || founds[n] < len(curSolution) {
+				founds[n] = i
+			}
+		} */
+
 		return
 	}
 
 	//get all hidden orders for all the bigger numbers
 	for _, n := range biggers {
+
+		// if not yet found or the found value is worse than what we have now
+		//if _, ok := founds[n]; !ok || founds[n] <= len(curSolution) {
 		getAllOrders(start, n, curSolution, orders)
+		//}
+
 	}
 }

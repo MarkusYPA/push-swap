@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
 )
@@ -256,7 +255,7 @@ func validate(stack []int) bool {
 func main() {
 	args := os.Args[1:]
 
-	if len(args) == 0 {
+	if len(args) == 0 || len(args[0]) == 0 {
 		return
 	}
 	if len(args) > 1 {
@@ -326,10 +325,12 @@ func main() {
 		fmt.Println(ins)
 	}
 
-	fmt.Println(len(instructions), "instructions")
-	if reflect.DeepEqual(stackA, aSorted) {
-		fmt.Println("Stack A is sorted")
-	} else {
-		fmt.Println("Stack A is NOT sorted")
-	}
+	/*
+		 	fmt.Println(len(instructions), "instructions")
+			if reflect.DeepEqual(stackA, aSorted) {
+				fmt.Println("Stack A is sorted")
+			} else {
+				fmt.Println("Stack A is NOT sorted")
+			}
+	*/
 }

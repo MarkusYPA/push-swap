@@ -3,22 +3,59 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 )
 
-func toNums(in string) []int {
+var (
+	stackA  []int
+	stackB  []int
+	aSorted []int
+)
+
+// toNums converts a string on numbers separated by spaces to a slice of ints
+func toNums(in string) ([]int, error) {
 	nums := []int{}
 	for _, numSt := range strings.Split(in, " ") {
 		numIn, err := strconv.Atoi(numSt)
 		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
+			return nil, fmt.Errorf("Error")
 		}
 		nums = append(nums, numIn)
 	}
-	return nums
+	return nums, nil
+}
+
+func validate(stack []int) bool {
+	for i := 0; i < len(stack)-1; i++ {
+		for j := i + 1; j < len(stack); j++ {
+			if stack[i] == stack[j] {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// bubSort is a bubble sort function that returns a slice of ints arranged according to the function f
+func bubSort(s []int, f func(a, b int) bool) []int {
+	sorted := make([]int, len(s))
+	copy(sorted, s)
+	for i := 0; i < len(sorted)-1; i++ {
+		for j := i + 1; j < len(sorted); j++ {
+			if f(sorted[i], sorted[j]) {
+				sorted[i], sorted[j] = sorted[j], sorted[i]
+			}
+		}
+	}
+	return sorted
+}
+
+func isGreater(a, b int) bool {
+	return a > b
 }
 
 func push(s1, s2 []int) ([]int, []int) {
@@ -61,20 +98,30 @@ func revRotate(s []int) []int {
 func main() {
 	args := os.Args[1:]
 
-	if len(args) != 1 {
-		panic("One argument please")
+	if len(args) == 0 || len(args[0]) == 0 {
+		return
+	}
+	if len(args) > 1 {
+		log.Fatalln("Use with one argument, e.g.: ./push-swap \"7 12 0 31 3\" ")
 	}
 
-	stackA := toNums(args[0])
-	stackB := []int{}
-
-	fmt.Println(stackA, stackB)
+	var err error
+	stackA, err = toNums(args[0])
+	if err != nil {
+		fmt.Println("Error")
+		return
+	}
+	if !validate(stackA) {
+		fmt.Println("Error")
+		return
+	}
+	aSorted = bubSort(stackA, isGreater)
 
 	scnr := bufio.NewScanner(os.Stdin)
 	for scnr.Scan() {
 		txt := scnr.Text()
 
-		if txt == "exit" || txt == "quit" {
+		if txt == "exit" || txt == "quit" || txt == "" {
 			break
 		}
 
@@ -107,7 +154,11 @@ func main() {
 		default:
 			continue
 		}
+	}
 
-		fmt.Println(stackA, stackB)
+	if reflect.DeepEqual(stackA, aSorted) && len(stackB) == 0 {
+		fmt.Println("OK")
+	} else {
+		fmt.Println("KO")
 	}
 }
