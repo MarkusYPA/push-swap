@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// hiddenOrder leaves the longest already sorted sequence of numbers on stackA, moves the rest to
+// hiddenOrder leaves an already sorted sequence of numbers on stackA, moves the rest to
 // stackB and then moves them back one-by-one into suitable gaps
 func hiddenOrder(ins []string) []string {
 
