@@ -55,6 +55,7 @@ func runComm(s string) {
 	runComms([]string{s})
 }
 
+// runComms runs the commands given as a slice of strings
 func runComms(strs []string) {
 	for _, s := range strs {
 
@@ -90,20 +91,20 @@ func runComms(strs []string) {
 	}
 }
 
+// push moves the first element of the slice s1 to the top of s2
 func push(s1, s2 []int) ([]int, []int) {
-	out := []int{}
-	if len(s1) > 0 {
-		out = append(out, s1[0])
-		for i := 0; i < len(s2); i++ {
-			out = append(out, s2[i])
-		}
-		s1 = s1[1:]
-	} else {
+
+	if len(s1) == 0 {
 		return s1, s2
 	}
-	return s1, out
+
+	out := []int{s1[0]}
+	out = append(out, s2...)
+
+	return s1[1:], out
 }
 
+// swap changes the first two elements around
 func swap(s []int) []int {
 	if len(s) > 1 {
 		s[0], s[1] = s[1], s[0]
@@ -111,6 +112,7 @@ func swap(s []int) []int {
 	return s
 }
 
+// rotate puts the first element last
 func rotate(s []int) []int {
 	if len(s) > 1 {
 		return append(s[1:], s[0])
@@ -119,6 +121,7 @@ func rotate(s []int) []int {
 	}
 }
 
+// revRotate puts the last element first
 func revRotate(s []int) []int {
 	if len(s) > 1 {
 		return append(s[len(s)-1:], s[0:len(s)-1]...)
@@ -127,6 +130,7 @@ func revRotate(s []int) []int {
 	}
 }
 
+// cleanInsts removes unnecessary instructions
 func cleanInsts(ins []string) []string {
 	found := true
 
@@ -205,23 +209,17 @@ func distances(a []int, num int) (int, int) {
 
 	// measure positive distance to num
 	posDis := 0
-	for posDis < len(a) {
-		if a[posDis] == num {
+	for i := 0; i < len(a); i++ {
+		if a[i] == num {
+			posDis = i
 			break
 		}
-		posDis++
 	}
 
-	// measure negative distance
+	// deduce negative distance
 	negDis := 0
-	for i := 0; negDis < len(a); i-- {
-		if i < 0 {
-			i = len(a) - 1
-		}
-		if a[i] == num {
-			break
-		}
-		negDis++
+	if posDis != 0 {
+		negDis = len(a) - posDis
 	}
 
 	return posDis, negDis
