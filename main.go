@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var (
@@ -258,7 +259,7 @@ func produceInstructions(argument string) ([]string, error) {
 	if !validate(stackA) {
 		return nil, fmt.Errorf("Error")
 	}
-	aSorted = bubSort(stackA, isGreater)
+	aSorted = bubSort(stackA, isGreater) // For checking stackA got sorted
 
 	// save the stacks for the other algorithm
 	origStackA := make([]int, len(stackA))
@@ -307,6 +308,8 @@ func main() {
 		log.Fatalln("Use with one argument, e.g.: ./push-swap \"7 12 0 31 3\" ")
 	}
 
+	startTime = time.Now()
+
 	instructions, err := produceInstructions(args[0])
 	if err != nil {
 		fmt.Println(err.Error())
@@ -316,6 +319,9 @@ func main() {
 	for _, ins := range instructions {
 		fmt.Println(ins)
 	}
+
+	//fmt.Println(len(instructions))
+	//fmt.Println(time.Since(startTime).Seconds(), "seconds from start 03")
 
 	/*		// test if the stack got sorted
 			 	fmt.Println(len(instructions), "instructions")

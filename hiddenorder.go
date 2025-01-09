@@ -2,6 +2,13 @@ package main
 
 import (
 	"fmt"
+	"sync"
+	"time"
+)
+
+var (
+	startTime time.Time
+	ordMutex  sync.Mutex
 )
 
 // hiddenOrder leaves an already sorted sequence of numbers on stackA, moves the rest to
@@ -9,10 +16,15 @@ import (
 func hiddenOrder(ins []string) []string {
 
 	allOrders := [][]int{}
+
 	for i := range stackA {
 		getAllOrders(i, i, []int{}, &allOrders)
 	}
+
+	//fmt.Println(time.Since(startTime).Seconds(), "seconds from start 01")
+
 	bestOs := bestOrders(&allOrders)
+
 	//fmt.Println("Length of all orders:", len(allOrders), "Bests found:", len(bestOs), "Length of Best:", len(bestOs[0]))
 
 	origStackA := make([]int, len(stackA))
@@ -113,7 +125,7 @@ func smallestOnList(s []int) int {
 	return small
 }
 
-// goodGapOnA checks if the element elemB from stackB fits in the gap between index indA and index indA+1 on stackA
+// midGapOnA checks if the element elemB from stackB fits in the gap between index indA and index indA+1 on stackA
 func midGapOnA(indA, elemB int) bool {
 	for i := 1; i < len(stackA); i++ {
 		if indA > 0 && stackA[indA-1] <= elemB && stackA[indA] >= elemB {
@@ -201,6 +213,7 @@ func nearestGap() (int, int, error) {
 
 					if distNow < distOld { // New pair is closer than the old one
 						p1, p2 = stackA[i], stackB[j]
+						distOld = distNow
 					}
 				}
 			}
@@ -229,7 +242,7 @@ func pushToB(nums []int) []string {
 	return ins
 }
 
-// bestOrder finds the longest sequence of ordered numbers with the lowest starting index
+// bestOrder finds the longest sequences of ordered numbers
 func bestOrders(allOrders *[][]int) [][]int {
 	longest := len((*allOrders)[0])
 	for _, o := range *allOrders {
@@ -243,24 +256,26 @@ func bestOrders(allOrders *[][]int) [][]int {
 			bests = append(bests, o)
 		}
 	}
-	for _, o := range *allOrders {
-		if len(o) > 1 && len(o) == longest-1 && len(bests) <= 5000 {
-			bests = append(bests, o)
-		}
-		/* if len(bests) == 5000 {
-			fmt.Println("at -1")
-			break
-		} */
-	}
-	for _, o := range *allOrders {
-		if len(o) > 1 && len(o) == longest-2 && len(bests) <= 5000 {
-			bests = append(bests, o)
-		}
-		/* if len(bests) == 5000 {
-			fmt.Println("at -2")
-			break
-		} */
-	}
+
+	/* 	for _, o := range *allOrders {
+	if len(o) > 1 && len(o) == longest-1 && len(bests) <= 5000 {
+		bests = append(bests, o)
+	} */
+	/* if len(bests) == 5000 {
+		fmt.Println("at -1")
+		break
+	} */
+	//}
+	/* 	for _, o := range *allOrders {
+	if len(o) > 1 && len(o) == longest-2 && len(bests) <= 5000 {
+		bests = append(bests, o)
+	} */
+	/* if len(bests) == 5000 {
+		fmt.Println("at -2")
+		break
+	} */
+	//}
+
 	return bests
 }
 
@@ -272,8 +287,7 @@ func bestOrders(allOrders *[][]int) [][]int {
 func getAllOrders(start int, index int, curSolution []int, orders *[][]int) {
 	curSolution = append(curSolution, index)
 
-	// Find the indices of all remaining values bigger than this
-	biggers := []int{}
+	biggers := []int{} // Indices of all remaining values bigger than this, each used as the next step
 	if index < start {
 		if start == len(stackA)-1 {
 			for i, n := range stackA[index:] {
@@ -306,7 +320,9 @@ func getAllOrders(start int, index int, curSolution []int, orders *[][]int) {
 		// copy values to a new slice to avoid pointer problems
 		toSave := make([]int, len(curSolution))
 		copy(toSave, curSolution)
+		ordMutex.Lock()
 		*orders = append(*orders, toSave)
+		ordMutex.Unlock()
 
 		/* 		for i, n := range toSave {
 			if _, ok := founds[n]; !ok || founds[n] < len(curSolution) {
@@ -322,8 +338,9 @@ func getAllOrders(start int, index int, curSolution []int, orders *[][]int) {
 
 		// if not yet found or the found value is worse than what we have now
 		//if _, ok := founds[n]; !ok || founds[n] <= len(curSolution) {
-		getAllOrders(start, n, curSolution, orders)
+		//getAllOrders(start, n, curSolution, orders, wg, false)
 		//}
 
+		getAllOrders(start, n, curSolution, orders)
 	}
 }
