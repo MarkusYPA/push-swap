@@ -3,7 +3,11 @@ package main
 import (
 	"log"
 	"os"
+	"strconv"
 	"testing"
+	"time"
+
+	"golang.org/x/exp/rand"
 )
 
 type testCaseBad struct {
@@ -118,9 +122,76 @@ func TestProduceInstructionsGood(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ins, _ := produceInstructions(tc.input)
 			result := len(ins)
-			if tc.expected < result {
+			if result > tc.expected {
 				t.Errorf("\n%s Input was \"%s\"\nWant fewer than %v instructions\ngot: %v", tc.name, tc.input, tc.expected+1, result)
 			}
 		})
 	}
+}
+
+func TestProduceInstructionsRandom(t *testing.T) {
+
+	// Can 1000 random sequences of five numbers be arranged in max 11 turns each?
+	// About 1/30 requires hidden order optimization 11.1.2025
+	for _, tc := range makeCases(1000, 5, 11) {
+		t.Run(tc.name, func(t *testing.T) {
+			ins, _ := produceInstructions(tc.input)
+			result := len(ins)
+			if result > tc.expected {
+				t.Errorf("\n%s Input was \"%s\"\nWant fewer than %v instructions\ngot: %v", tc.name, tc.input, tc.expected+1, result)
+			}
+		})
+	}
+
+	// 50 numbers in max 250 turns? Not an audit question. Not without hidden order optimization.
+	for _, tc := range makeCases(50, 50, 250) {
+		t.Run(tc.name, func(t *testing.T) {
+			ins, _ := produceInstructions(tc.input)
+			result := len(ins)
+			if result > tc.expected {
+				t.Errorf("\n%s Input was \"%s\"\nWant fewer than %v instructions\ngot: %v", tc.name, tc.input, tc.expected+1, result)
+			}
+		})
+	}
+
+	// 100 numbers in max 699 turns? ~1/500 requires optimization. 11.1.2025
+	for _, tc := range makeCases(20, 100, 699) {
+		t.Run(tc.name, func(t *testing.T) {
+			ins, _ := produceInstructions(tc.input)
+			result := len(ins)
+			if result > tc.expected {
+				t.Errorf("\n%s Input was \"%s\"\nWant fewer than %v instructions\ngot: %v", tc.name, tc.input, tc.expected+1, result)
+			} else {
+				//fmt.Println(result)
+			}
+		})
+	}
+}
+
+func makeCases(amount, length, expected int) []testCaseGood {
+
+	rand.Seed(uint64(time.Now().UnixNano()))
+
+	cases := make([]testCaseGood, amount)
+	for i := range amount {
+
+		name := "random" + strconv.Itoa(i)
+
+		numbers := make([]int, length)
+		for i := 0; i < length; i++ {
+			numbers[i] = i
+		}
+		rand.Shuffle(len(numbers), func(i, j int) { // Randomize order
+			numbers[i], numbers[j] = numbers[j], numbers[i]
+		})
+
+		input := ""
+		for _, num := range numbers {
+			input += strconv.Itoa(num) + " "
+		}
+
+		cases[i].name, cases[i].expected, cases[i].input = name, expected, input[:len(input)-1]
+	}
+
+	return cases
 }

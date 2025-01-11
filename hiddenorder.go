@@ -17,20 +17,26 @@ func hiddenOrder(ins []string) []string {
 
 	allOrders := [][]int{}
 
+	wg := sync.WaitGroup{}
 	for i := range stackA {
-		getAllOrders(i, i, []int{}, &allOrders)
+		wg.Add(1)
+		getAllOrders(i, i, []int{}, &allOrders, &wg, true)
 	}
+	wg.Wait()
 
 	//fmt.Println(time.Since(startTime).Seconds(), "seconds from start 01")
 
 	bestOs := bestOrders(&allOrders)
 
+	//fmt.Println(time.Since(startTime).Seconds(), "seconds from start 02")
 	//fmt.Println("Length of all orders:", len(allOrders), "Bests found:", len(bestOs), "Length of Best:", len(bestOs[0]))
 
 	origStackA := make([]int, len(stackA))
 	origStackB := make([]int, len(stackB))
 	copy(origStackA, stackA)
 	copy(origStackB, stackB)
+
+	//bestOs := [][]int{{len(stackA) - 2, len(stackA) - 1}}
 
 	bestNewInsts := []string{}
 	for i, best := range bestOs {
@@ -284,7 +290,16 @@ func bestOrders(allOrders *[][]int) [][]int {
 
 // getAllOrders finds all sequences of increasing numbers through stackA starting from
 // the element at index start
-func getAllOrders(start int, index int, curSolution []int, orders *[][]int) {
+func getAllOrders(start int, index int, curSolution []int, orders *[][]int, wg *sync.WaitGroup, first bool) {
+
+	// 2^20 should be enough to find one good enough to pass the audit
+	if len(*orders) >= 1048576 {
+		if first {
+			wg.Done()
+		}
+		return
+	}
+
 	curSolution = append(curSolution, index)
 
 	biggers := []int{} // Indices of all remaining values bigger than this, each used as the next step
@@ -330,6 +345,9 @@ func getAllOrders(start int, index int, curSolution []int, orders *[][]int) {
 			}
 		} */
 
+		if first {
+			wg.Done()
+		}
 		return
 	}
 
@@ -340,7 +358,11 @@ func getAllOrders(start int, index int, curSolution []int, orders *[][]int) {
 		//if _, ok := founds[n]; !ok || founds[n] <= len(curSolution) {
 		//getAllOrders(start, n, curSolution, orders, wg, false)
 		//}
-
-		getAllOrders(start, n, curSolution, orders)
+		getAllOrders(start, n, curSolution, orders, wg, false)
 	}
+
+	if first {
+		wg.Done()
+	}
+
 }
