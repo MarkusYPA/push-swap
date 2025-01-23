@@ -11,9 +11,9 @@ import (
 )
 
 var (
-	stackA  []int
-	stackB  []int
-	aSorted []int
+	StackA  []int
+	StackB  []int
+	ASorted []int
 )
 
 // toNums converts a string on numbers separated by spaces to a slice of ints
@@ -106,16 +106,16 @@ func main() {
 	}
 
 	var err error
-	stackA, err = toNums(args[0])
+	StackA, err = toNums(args[0])
 	if err != nil {
 		fmt.Println("Error")
 		return
 	}
-	if !validate(stackA) {
+	if !validate(StackA) {
 		fmt.Println("Error")
 		return
 	}
-	aSorted = bubSort(stackA, isGreater)
+	ASorted = bubSort(StackA, isGreater)
 
 	scnr := bufio.NewScanner(os.Stdin)
 	for scnr.Scan() {
@@ -127,36 +127,36 @@ func main() {
 
 		switch txt {
 		case "pa":
-			stackB, stackA = push(stackB, stackA)
+			StackB, StackA = push(StackB, StackA)
 		case "pb":
-			stackA, stackB = push(stackA, stackB)
+			StackA, StackB = push(StackA, StackB)
 		case "sa":
-			stackA = swap(stackA)
+			StackA = swap(StackA)
 		case "sb":
-			stackB = swap(stackB)
+			StackB = swap(StackB)
 		case "ss":
-			stackA = swap(stackA)
-			stackB = swap(stackB)
+			StackA = swap(StackA)
+			StackB = swap(StackB)
 		case "ra":
-			stackA = rotate(stackA)
+			StackA = rotate(StackA)
 		case "rb":
-			stackB = rotate(stackB)
+			StackB = rotate(StackB)
 		case "rr":
-			stackA = rotate(stackA)
-			stackB = rotate(stackB)
+			StackA = rotate(StackA)
+			StackB = rotate(StackB)
 		case "rra":
-			stackA = revRotate(stackA)
+			StackA = revRotate(StackA)
 		case "rrb":
-			stackB = revRotate(stackB)
+			StackB = revRotate(StackB)
 		case "rrr":
-			stackA = revRotate(stackA)
-			stackB = revRotate(stackB)
+			StackA = revRotate(StackA)
+			StackB = revRotate(StackB)
 		default:
 			continue
 		}
 	}
 
-	if reflect.DeepEqual(stackA, aSorted) && len(stackB) == 0 {
+	if reflect.DeepEqual(StackA, ASorted) && len(StackB) == 0 {
 		fmt.Println("OK")
 	} else {
 		fmt.Println("KO")
