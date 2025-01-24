@@ -94,8 +94,8 @@ func cleanInsts(ins []string) []string {
 	return ins
 }
 
-// produceInstructions reads the input, runs two different sorting algorithms on it to get
-// two separate sets of instructions as slices and chooses the shorter slice for output
+// produceInstructions reads the input, runs different sorting algorithms on it to get
+// separate sets of instructions as slices and chooses the shortest slice for output
 func produceInstructions(argument string) ([]string, error) {
 	var err error
 	stacks.StackA, err = utils.ToNums(argument)
@@ -107,7 +107,7 @@ func produceInstructions(argument string) ([]string, error) {
 	}
 	stacks.ASorted = utils.BubSort(stacks.StackA, utils.IsGreater) // For checking StackA got sorted and finding smallest value
 
-	// save the stacks for the other algorithms
+	// save the stacks to restore them between algorithms
 	origStackA := make([]int, len(stacks.StackA))
 	origStackB := make([]int, len(stacks.StackB))
 	copy(origStackA, stacks.StackA)
@@ -115,6 +115,7 @@ func produceInstructions(argument string) ([]string, error) {
 
 	instructionSets := [][]string{}
 
+	// instructions to sort with OnlySwap()
 	instructions0 := switcheroo.OnlySwap()
 	instructions0 = cleanInsts(instructions0)
 	instructionSets = append(instructionSets, instructions0)
@@ -125,6 +126,7 @@ func produceInstructions(argument string) ([]string, error) {
 	copy(stacks.StackA, origStackA)
 	copy(stacks.StackB, origStackB)
 
+	// instructions to sort with SortToBMethod()
 	instructions1 := sorttob.SortToBMethod()
 	instructions1 = cleanInsts(instructions1)
 	instructionSets = append(instructionSets, instructions1)
@@ -135,6 +137,7 @@ func produceInstructions(argument string) ([]string, error) {
 	copy(stacks.StackA, origStackA)
 	copy(stacks.StackB, origStackB)
 
+	// instructions to sort with HiddenOrder()
 	instructions2 := hiddenorder.HiddenOrder()
 	instructions2 = cleanInsts(instructions2)
 	instructionSets = append(instructionSets, instructions2)
@@ -142,16 +145,10 @@ func produceInstructions(argument string) ([]string, error) {
 	// choose the shortest instructions
 	instructions := instructionSets[0]
 	for _, set := range instructionSets {
-		if len(set) <= len(instructions) {
+		if len(set) < len(instructions) {
 			instructions = set
 		}
 	}
-
-	/* 	stacks.StackA = make([]int, len(origstacks.StackA)) // restore stacks and run commands for testing inside this program
-	   	stacks.StackB = make([]int, len(origstacks.StackB))
-	   	copy(stacks.StackA, origstacks.StackA)
-	   	copy(stacks.StackB, origstacks.StackB)
-	   	runComms(instructions) */
 
 	return instructions, nil
 }
