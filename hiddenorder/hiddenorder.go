@@ -11,8 +11,8 @@ var (
 	ordMutex sync.Mutex
 )
 
-// hiddenOrder leaves an already sorted sequence of numbers on stacks.StackA, moves the rest to
-// stacks.StackB and then moves them back one-by-one into suitable gaps
+// hiddenOrder leaves an already sorted sequence of numbers on StackA, moves the rest to
+// StackB, and then moves them back one-by-one into suitable gaps
 func HiddenOrder(ins []string) []string {
 
 	allOrders := [][]int{}
@@ -127,14 +127,11 @@ func smallestOnList(s []int) int {
 	return small
 }
 
-// midGapOnA checks if the element elemB from stacks.StackB fits in the gap between index indA and index indA+1 on stacks.StackA
+// midGapOnA checks if the element elemB from StackB fits in the gap between index indA and index indA+1 on StackA
 func midGapOnA(indA, elemB int) bool {
-	for i := 1; i < len(stacks.StackA); i++ {
-		if indA > 0 && stacks.StackA[indA-1] <= elemB && stacks.StackA[indA] >= elemB {
-			return true
-		}
+	if indA > 0 && stacks.StackA[indA-1] <= elemB && stacks.StackA[indA] >= elemB {
+		return true
 	}
-
 	if indA == 0 {
 		aLast := stacks.StackA[len(stacks.StackA)-1]
 		return aLast <= elemB && stacks.StackA[0] >= elemB
@@ -142,14 +139,15 @@ func midGapOnA(indA, elemB int) bool {
 	return false
 }
 
+// endGapOnA assumes stackA is sorted and randomly rotated.
+// It returns true if the element at indA is the smallest one and elemB would be the biggest entry
+// and therefore should be placed right in front of indA.
 func endGapOnA(indA, elemB int) bool {
-	for i := 1; i < len(stacks.StackA); i++ {
-		if indA > 0 {
-			aPrev := stacks.StackA[indA-1]
-			aThis := stacks.StackA[indA]
-			if aPrev > aThis && (elemB > aPrev || elemB < aThis) {
-				return true
-			}
+	if indA > 0 {
+		aPrev := stacks.StackA[indA-1]
+		aThis := stacks.StackA[indA]
+		if aPrev > aThis && (elemB > aPrev || elemB < aThis) {
+			return true
 		}
 	}
 	if indA == 0 {
@@ -159,6 +157,7 @@ func endGapOnA(indA, elemB int) bool {
 	return false
 }
 
+// min returns the smallest of the two given values
 func min(n1, n2 int) int {
 	if n1 < n2 {
 		return n1
@@ -166,38 +165,8 @@ func min(n1, n2 int) int {
 	return n2
 }
 
-func nearestEndGap() (int, int, error) {
-	p1, p2 := 0, 0
-	foundOne := false
-	distOld := -1
-
-	for i := 0; i < len(stacks.StackA); i++ {
-		for j := 0; j < len(stacks.StackB); j++ {
-			if endGapOnA(i, stacks.StackB[j]) {
-				if !foundOne {
-					p1, p2 = stacks.StackA[i], stacks.StackB[j]
-					distOld = min(utils.Distances(stacks.StackA, p1)) + min(utils.Distances(stacks.StackB, p2))
-					foundOne = true
-				} else {
-					distNow := min(utils.Distances(stacks.StackA, stacks.StackA[i])) + min(utils.Distances(stacks.StackB, stacks.StackB[j]))
-
-					if distNow < distOld { // New pair is closer than the old one
-						p1, p2 = stacks.StackA[i], stacks.StackB[j]
-					}
-				}
-			}
-		}
-	}
-
-	if foundOne {
-		return p1, p2, nil
-	} else {
-		return p1, p2, fmt.Errorf("no gap found")
-	}
-}
-
-// nearestPair finds the gap on stacks.StackA that fits an element from stacks.StackB that can be filled with
-// the fewest moves
+// nearestPair finds all the suitable gaps on stackA for each element on StackB, and chooses the move
+// that can be executed with the fewest moves
 func nearestGap() (int, int, error) {
 	p1, p2 := 0, 0
 	foundOne := false
@@ -261,9 +230,6 @@ func bestOrders(allOrders *[][]int) [][]int {
 
 	return bests
 }
-
-// Store examined values on a map with their indices at that solution (later is better)
-//var founds map[int]int = map[int]int{}
 
 // getAllOrders finds all sequences of increasing numbers through stacks.StackA starting from
 // the element at index start
