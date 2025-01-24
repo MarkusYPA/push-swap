@@ -79,7 +79,9 @@ func shortestToBLast(a []int) []string {
 
 // sort toBMethod first pushes n-2 elements from StackA to StackB
 // so they are there in reverse order, and then pushes them back
-func SortToBMethod(ins []string) []string {
+func SortToBMethod() []string {
+	ins := []string{}
+
 	stacks.BSorted = utils.BubSort(stacks.StackA, utils.IsSmaller)
 	if len(stacks.BSorted) > 2 {
 		stacks.BSorted = stacks.BSorted[2:]

@@ -13,8 +13,8 @@ var (
 
 // hiddenOrder leaves an already sorted sequence of numbers on StackA, moves the rest to
 // StackB, and then moves them back one-by-one into suitable gaps
-func HiddenOrder(ins []string) []string {
-
+func HiddenOrder() []string {
+	ins := []string{}
 	allOrders := [][]int{}
 
 	wg := sync.WaitGroup{}
